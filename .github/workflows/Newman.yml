@@ -1,0 +1,56 @@
+
+```yaml
+name: Postman Collection Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  newman:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: نصب Newman
+        run: npm install -g newman
+
+      - name: ساخت فایل environment
+        run: |
+          cat > postman-env.json << EOF
+          {
+            "id": "ci-env",
+            "name": "CI Environment",
+            "values": [
+              {"key": "api_key",          "value": "${{ secrets.SMS_API_KEY }}", "enabled": true},
+              {"key": "esb_auth",         "value": "${{ secrets.SMS_ESB_AUTH }}", "enabled": true},
+              {"key": "sender_number",    "value": "${{ secrets.SMS_SENDER }}", "enabled": true},
+              {"key": "recipient_number", "value": "${{ secrets.SMS_TEST_RECIPIENT }}", "enabled": true},
+              {"key": "rest_base_url",    "value": "http://sms.persiafava.com/webservice/rest", "enabled": true},
+              {"key": "esb_base_url",     "value": "https://sms.persiafava.com", "enabled": true},
+              {"key": "dargah",           "value": "3000", "enabled": true},
+              {"key": "last_smsid",       "value": "", "enabled": true},
+              {"key": "last_smsids",      "value": "[]", "enabled": true},
+              {"key": "last_received_id", "value": "0", "enabled": true}
+            ]
+          }
+          EOF
+
+      - name: اجرای collection (فقط health check requests)
+        run: |
+          newman run docs/PersiaFava_SMS_Gateway.postman_collection.json \
+            --environment postman-env.json \
+            --folder "وب‌سرویس REST" \
+            --item "اطلاعات کاربر (user_info)" \
+            --reporters cli,json \
+            --reporter-json-export newman-results.json \
+            --timeout-request 15000
+
+      - name: آپلود نتایج
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newman-results
+          path: newman-results.json
+```
