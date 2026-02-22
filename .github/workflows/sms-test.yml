@@ -1,0 +1,111 @@
+```yaml
+name: SMS Gateway Smoke Test
+
+on:
+  workflow_dispatch:          # اجرای دستی از GitHub UI
+    inputs:
+      platform:
+        description: 'پلتفرم مورد تست'
+        required: true
+        default: 'esb'
+        type: choice
+        options:
+          - esb
+          - rest
+          - both
+      send_real_sms:
+        description: 'ارسال پیامک واقعی؟'
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  test-esb:
+    name: تست ESB v2
+    runs-on: ubuntu-latest
+    if: ${{ inputs.platform == 'esb' || inputs.platform == 'both' }}
+
+    steps:
+      - name: بررسی اتصال — UserInfo
+        run: |
+          RESPONSE=$(curl -sk \
+            -H "Authorization: Basic ${{ secrets.SMS_ESB_AUTH }}" \
+            https://sms.persiafava.com:3006/UserInfo)
+          echo "Response: $RESPONSE"
+          STATUS=$(echo $RESPONSE | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
+          if [ "$STATUS" != "0" ]; then
+            echo "UserInfo failed with status $STATUS"
+            exit 1
+          fi
+          echo "UserInfo OK"
+
+      - name: تست ارسال OTP
+        if: ${{ inputs.send_real_sms == true }}
+        run: |
+          UID="gh-action-$(date +%s)-otp"
+          RESPONSE=$(curl -sk -X POST \
+            -H "Authorization: Basic ${{ secrets.SMS_ESB_AUTH }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"sender\":    \"${{ secrets.SMS_SENDER }}\",
+              \"recipient\": \"${{ secrets.SMS_TEST_RECIPIENT }}\",
+              \"message\":   \"کد تست GitHub Actions: 99999\",
+              \"uid\":       \"$UID\"
+            }" \
+            https://sms.persiafava.com:3002/Otp)
+          echo "OTP Response: $RESPONSE"
+          STATUS=$(echo $RESPONSE | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
+          if [ "$STATUS" != "0" ]; then
+            echo "OTP send failed"
+            exit 1
+          fi
+          SMSID=$(echo $RESPONSE | python3 -c "import sys,json; print(json.load(sys.stdin)['smsid'])")
+          echo "OTP sent. smsid=$SMSID"
+          echo "SMSID=$SMSID" >> $GITHUB_ENV
+
+      - name: بررسی وضعیت دلیوری
+        if: ${{ inputs.send_real_sms == true && env.SMSID != '' }}
+        run: |
+          sleep 10
+          RESPONSE=$(curl -sk -X POST \
+            -H "Authorization: Basic ${{ secrets.SMS_ESB_AUTH }}" \
+            -H "Content-Type: application/json" \
+            -d "[\"$SMSID\"]" \
+            https://sms.persiafava.com:3003/Delivery)
+          echo "Delivery Response: $RESPONSE"
+
+  test-rest:
+    name: تست وب‌سرویس REST
+    runs-on: ubuntu-latest
+    if: ${{ inputs.platform == 'rest' || inputs.platform == 'both' }}
+
+    steps:
+      - name: بررسی اتصال — user_info
+        run: |
+          RESPONSE=$(curl -sk \
+            "http://sms.persiafava.com/webservice/rest/user_info?api_key=${{ secrets.SMS_API_KEY }}")
+          echo "Response: $RESPONSE"
+          RESULT=$(echo $RESPONSE | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('result',''))")
+          if [ "$RESULT" != "True" ] && [ "$RESULT" != "true" ]; then
+            echo "user_info failed"
+            exit 1
+          fi
+          echo "user_info OK"
+
+      - name: تست ارسال پیامک
+        if: ${{ inputs.send_real_sms == true }}
+        run: |
+          RESPONSE=$(curl -sk -X POST \
+            http://sms.persiafava.com/webservice/rest/sms_send \
+            --data-urlencode "api_key=${{ secrets.SMS_API_KEY }}" \
+            --data-urlencode "sender_number=${{ secrets.SMS_SENDER }}" \
+            --data-urlencode "receiver_number=${{ secrets.SMS_TEST_RECIPIENT }}" \
+            --data-urlencode "note_arr[]=تست GitHub Actions")
+          echo "Send Response: $RESPONSE"
+          RESULT=$(echo $RESPONSE | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('result',''))")
+          if [ "$RESULT" != "True" ] && [ "$RESULT" != "true" ]; then
+            echo "sms_send failed"
+            exit 1
+          fi
+          echo "sms_send OK"
+```
