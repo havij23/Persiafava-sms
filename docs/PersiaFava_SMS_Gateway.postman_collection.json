@@ -1,0 +1,1080 @@
+{
+ "info": {
+ "_postman_id": "e05c7a26-b823-4320-8c29-8e2432026216",
+ "name": "پرشیا فاوا — SMS Gateway (REST + ESB v2)",
+ "description": "مستندات کامل وب‌سرویس پیام کوتاه پرشیا فاوا.\n\n**دو پلتفرم:**\n- وب‌سرویس REST (Legacy) — مناسب برای وب‌سایت‌ها و PHP\n- ESB v2 — پیشنهاد شده برای پروژه‌های جدید\n\n**راه‌اندازی سریع:**\n1. به تب `Variables` بروید\n2. مقادیر `api_key` (یا `esb_auth`) و `sender_number` را پر کنید\n3. هر request که smsid برمی‌گرداند، مقدار را خودکار در متغیر `last_smsid` ذخیره می‌کند\n4. request بعدی (مثل Delivery) مستقیم از همان متغیر استفاده می‌کند\n\n**متغیرهای کلیدی:**\n| متغیر | توضیح |\n|---|---|\n| `api_key` | کلید API برای REST |\n| `esb_auth` | رشته Base64 احراز هویت ESB v2 |\n| `sender_number` | شماره فرستنده |\n| `recipient_number` | شماره گیرنده پیش‌فرض |\n| `last_smsid` | آخرین smsid برگشتی (خودکار) |\n| `last_smsids` | آرایه JSON از smsidها (خودکار) |\n| `last_received_id` | آخرین id دریافتی (خودکار) |",
+ "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+ },
+ "variable": [
+ {
+ "key": "rest_base_url",
+ "value": "http://sms.persiafava.com/webservice/rest",
+ "type": "string",
+ "description": "آدرس پایه وب‌سرویس REST"
+ },
+ {
+ "key": "esb_base_url",
+ "value": "https://sms.persiafava.com",
+ "type": "string",
+ "description": "آدرس پایه ESB v2"
+ },
+ {
+ "key": "api_key",
+ "value": "YOUR_API_KEY_HERE",
+ "type": "string",
+ "description": "کلید API برای وب‌سرویس REST — از sms.persiafava.com/fullmode/webservice_setting.html دریافت کنید"
+ },
+ {
+ "key": "login_username",
+ "value": "",
+ "type": "string",
+ "description": "نام کاربری — جایگزین api_key"
+ },
+ {
+ "key": "login_password",
+ "value": "",
+ "type": "string",
+ "description": "رمز عبور — جایگزین api_key"
+ },
+ {
+ "key": "esb_auth",
+ "value": "YOUR_BASE64_AUTH_STRING",
+ "type": "string",
+ "description": "رشته base64 برای ESB v2 (base64 از username:password)"
+ },
+ {
+ "key": "sender_number",
+ "value": "3000569999",
+ "type": "string",
+ "description": "شماره فرستنده پیش‌فرض"
+ },
+ {
+ "key": "recipient_number",
+ "value": "+989127962521",
+ "type": "string",
+ "description": "شماره گیرنده پیش‌فرض برای تست"
+ },
+ {
+ "key": "dargah",
+ "value": "3000",
+ "type": "string",
+ "description": "درگاه ارسال برای وب‌سرویس REST — به جدول درگاه‌ها مراجعه کنید"
+ },
+ {
+ "key": "last_smsid",
+ "value": "",
+ "type": "string",
+ "description": "آخرین smsid دریافتی — خودکار از پاسخ ارسال پر می‌شود"
+ },
+ {
+ "key": "last_smsids",
+ "value": "[]",
+ "type": "string",
+ "description": "آرایه JSON از آخرین smsidهای دریافتی — خودکار پر می‌شود"
+ },
+ {
+ "key": "last_received_id",
+ "value": "0",
+ "type": "string",
+ "description": "آخرین id پیامک دریافتی — خودکار از ReceivedList پر می‌شود"
+ },
+ {
+ "key": "esb_otp_smsid",
+ "value": "",
+ "type": "string",
+ "description": "آخرین smsid ارسال OTP — خودکار پر می‌شود"
+ }
+ ],
+ "item": [
+ {
+ "name": "وب‌سرویس REST",
+ "description": "وب‌سرویس REST پرشیا فاوا — مناسب برای وب‌سایت‌ها و PHP\n\n**آدرس پایه:** `{{rest_base_url}}`\n\n**احراز هویت:** پارامتر `api_key` را در همه درخواست‌ها ارسال کنید، یا از `login_username` + `login_password` استفاده کنید.\n\nمقدار `api_key` را در متغیرهای collection تنظیم کنید.",
+ "item": [
+ {
+ "name": "اطلاعات کاربر (user_info)",
+ "request": {
+ "method": "GET",
+ "header": [
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": true
+ }
+ ],
+ "url": {
+ "raw": "{{rest_base_url}}/user_info?api_key={{api_key}}",
+ "host": [
+ "{{rest_base_url}}"
+ ],
+ "path": [
+ "user_info"
+ ],
+ "query": [
+ {
+ "key": "api_key",
+ "value": "{{api_key}}",
+ "description": "کلید API"
+ },
+ {
+ "key": "login_username",
+ "value": "{{login_username}}",
+ "description": "نام کاربری (جایگزین api_key)",
+ "disabled": true
+ },
+ {
+ "key": "login_password",
+ "value": "{{login_password}}",
+ "description": "رمز عبور (جایگزین api_key)",
+ "disabled": true
+ }
+ ]
+ },
+ "description": "دریافت اطلاعات کاربری، شماره‌های اختصاصی و موجودی حساب.\n\n**پاسخ موفق:**\n```json\n{\n \"result\": true,\n \"list\": {\n \"username\": \"admin_USERNAME\",\n \"cash\": \"3212509\",\n \"date_expire\": \"1403/2/24 00:00\"\n },\n \"number\": {\n \"list_user\": [{\"number\": \"3000569999\"}]\n }\n}\n```"
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status 200', function(){ pm.response.to.have.status(200); });",
+ "var json = pm.response.json();",
+ "pm.test('result is true', function(){ pm.expect(json.result).to.eql(true); });",
+ "if (json.result && json.number && json.number.list_user && json.number.list_user.length > 0) {",
+ " pm.collectionVariables.set('sender_number', json.number.list_user[0].number);",
+ " console.log('sender_number auto-set to:', json.number.list_user[0].number);",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "ارسال پیامک — تکی (sms_send)",
+ "request": {
+ "method": "POST",
+ "header": [
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": false
+ }
+ ],
+ "url": {
+ "raw": "{{rest_base_url}}/sms_send",
+ "host": [
+ "{{rest_base_url}}"
+ ],
+ "path": [
+ "sms_send"
+ ]
+ },
+ "description": "ارسال یک پیامک به یک گیرنده.\n\n**پاسخ موفق:**\n```json\n{\"result\": true, \"list\": [\"92943981\"]}\n```\n\n**خطای نمونه:**\n```json\n{\"result\": false, \"error\": \"error_credit_error\"}\n```\n\n> auto-fill: پس از موفقیت، `last_smsid` و `last_smsids` خودکار پر می‌شوند.",
+ "body": {
+ "mode": "urlencoded",
+ "urlencoded": [
+ {
+ "key": "api_key",
+ "value": "{{api_key}}",
+ "description": "کلید API",
+ "type": "text"
+ },
+ {
+ "key": "sender_number",
+ "value": "{{sender_number}}",
+ "description": "شماره فرستنده",
+ "type": "text"
+ },
+ {
+ "key": "receiver_number",
+ "value": "{{recipient_number}}",
+ "description": "شماره گیرنده",
+ "type": "text"
+ },
+ {
+ "key": "note_arr[]",
+ "value": "سلام! این یک پیامک آزمایشی است.",
+ "description": "متن پیامک",
+ "type": "text"
+ },
+ {
+ "key": "dargah",
+ "value": "{{dargah}}",
+ "description": "درگاه ارسال — به جدول درگاه‌ها مراجعه کنید",
+ "type": "text",
+ "disabled": true
+ },
+ {
+ "key": "tb_name_in_smsid",
+ "value": "ok",
+ "description": "برای استفاده از متد sms_deliver_tb_name_in_smsid",
+ "type": "text",
+ "disabled": true
+ }
+ ]
+ }
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+ "",
+ "var json = pm.response.json();",
+ "pm.test('REST result is true', function() {",
+ " pm.expect(json.result).to.eql(true);",
+ "});",
+ "",
+ "if (json.result === true && json.list) {",
+ " var ids = Array.isArray(json.list) ? json.list : Object.keys(json.list);",
+ " pm.collectionVariables.set('last_smsids', JSON.stringify(ids));",
+ " if (ids.length > 0) pm.collectionVariables.set('last_smsid', ids[0]);",
+ " console.log('REST smsids saved:', ids);",
+ "} else {",
+ " console.warn('ERROR REST:', json.error || json);",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "ارسال نظیر به نظیر (sms_send P2P)",
+ "request": {
+ "method": "POST",
+ "header": [
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": false
+ }
+ ],
+ "url": {
+ "raw": "{{rest_base_url}}/sms_send",
+ "host": [
+ "{{rest_base_url}}"
+ ],
+ "path": [
+ "sms_send"
+ ]
+ },
+ "description": "ارسال پیام‌های متفاوت به چند گیرنده در یک درخواست.\n\nتعداد `receiver_number[]` و `note_arr[]` باید برابر باشد.",
+ "body": {
+ "mode": "urlencoded",
+ "urlencoded": [
+ {
+ "key": "api_key",
+ "value": "{{api_key}}",
+ "description": "کلید API",
+ "type": "text"
+ },
+ {
+ "key": "sender_number",
+ "value": "{{sender_number}}",
+ "description": "شماره فرستنده",
+ "type": "text"
+ },
+ {
+ "key": "receiver_number[]",
+ "value": "{{recipient_number}}",
+ "description": "گیرنده اول",
+ "type": "text"
+ },
+ {
+ "key": "receiver_number[]",
+ "value": "+989137001122",
+ "description": "گیرنده دوم",
+ "type": "text"
+ },
+ {
+ "key": "note_arr[]",
+ "value": "پیام اختصاصی برای گیرنده اول",
+ "description": "متن گیرنده اول",
+ "type": "text"
+ },
+ {
+ "key": "note_arr[]",
+ "value": "پیام اختصاصی برای گیرنده دوم",
+ "description": "متن گیرنده دوم",
+ "type": "text"
+ }
+ ]
+ }
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+ "",
+ "var json = pm.response.json();",
+ "pm.test('REST result is true', function() {",
+ " pm.expect(json.result).to.eql(true);",
+ "});",
+ "",
+ "if (json.result === true && json.list) {",
+ " var ids = Array.isArray(json.list) ? json.list : Object.keys(json.list);",
+ " pm.collectionVariables.set('last_smsids', JSON.stringify(ids));",
+ " if (ids.length > 0) pm.collectionVariables.set('last_smsid', ids[0]);",
+ " console.log('REST smsids saved:', ids);",
+ "} else {",
+ " console.warn('ERROR REST:', json.error || json);",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "وضعیت پیامک (sms_deliver)",
+ "request": {
+ "method": "GET",
+ "header": [
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": true
+ }
+ ],
+ "url": {
+ "raw": "{{rest_base_url}}/sms_deliver?api_key={{api_key}}&smsid[]={{last_smsid}}&dargah={{dargah}}",
+ "host": [
+ "{{rest_base_url}}"
+ ],
+ "path": [
+ "sms_deliver"
+ ],
+ "query": [
+ {
+ "key": "api_key",
+ "value": "{{api_key}}",
+ "description": "کلید API"
+ },
+ {
+ "key": "smsid[]",
+ "value": "{{last_smsid}}",
+ "description": "شناسه پیامک — از last_smsid خودکار پر می‌شود"
+ },
+ {
+ "key": "dargah",
+ "value": "{{dargah}}",
+ "description": "درگاه ارسال"
+ },
+ {
+ "key": "archive_year",
+ "value": "",
+ "description": "سال ارسال برای جستجو در آرشیو (مثال: 1402)",
+ "disabled": true
+ },
+ {
+ "key": "archive_month",
+ "value": "",
+ "description": "ماه ارسال برای جستجو در آرشیو",
+ "disabled": true
+ }
+ ]
+ },
+ "description": "وضعیت تحویل پیامک‌های ارسال‌شده را بررسی کنید.\n\nمقدار `{{last_smsid}}` خودکار از آخرین درخواست ارسال پر می‌شود.\n\n**وضعیت‌ها:**\n| کد | معنا |\n|---|---|\n| 1 | رسیده به گوشی |\n| 2 | نرسیده به گوشی |\n| 4 | ارسال شده به مخابرات ⏳ |\n| 5 | لیست سیاه مخابرات |\n\nوضعیت‌ها هر ۳۰ دقیقه به‌روزرسانی می‌شوند."
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status 200', function(){ pm.response.to.have.status(200); });",
+ "var json = pm.response.json();",
+ "pm.test('result is true', function(){ pm.expect(json.result).to.eql(true); });",
+ "if (json.result && json.list) {",
+ " console.log(' Delivery statuses:');",
+ " Object.keys(json.list).forEach(function(id) {",
+ " var s = json.list[id];",
+ " var labels = {'1':' رسیده','2':'نرسیده','4':'در راه','5':'لیست سیاه'};",
+ " console.log(' ' + id + ' → ' + (labels[s] || 'کد ' + s));",
+ " });",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "پیامک‌های دریافتی (sms_receive_list)",
+ "request": {
+ "method": "GET",
+ "header": [
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": true
+ }
+ ],
+ "url": {
+ "raw": "{{rest_base_url}}/sms_receive_list?api_key={{api_key}}&page_number=1&perpage=20&read=0",
+ "host": [
+ "{{rest_base_url}}"
+ ],
+ "path": [
+ "sms_receive_list"
+ ],
+ "query": [
+ {
+ "key": "api_key",
+ "value": "{{api_key}}",
+ "description": "کلید API"
+ },
+ {
+ "key": "page_number",
+ "value": "1",
+ "description": "شماره صفحه (از ۱)"
+ },
+ {
+ "key": "perpage",
+ "value": "20",
+ "description": "تعداد نتایج در هر صفحه"
+ },
+ {
+ "key": "read",
+ "value": "0",
+ "description": "۰=خوانده‌نشده، ۱=خوانده‌شده، خالی=همه"
+ },
+ {
+ "key": "fromid",
+ "value": "{{last_received_id}}",
+ "description": "پیام‌های جدیدتر از این ID — برای polling",
+ "disabled": true
+ },
+ {
+ "key": "number",
+ "value": "",
+ "description": "فیلتر بر اساس خط اختصاصی",
+ "disabled": true
+ }
+ ]
+ },
+ "description": "لیست پیامک‌های دریافتی (MO).\n\n> auto-fill: `last_received_id` از اولین آیتم پاسخ ذخیره می‌شود.\n\nبرای polling از پارامتر `fromid={{last_received_id}}` استفاده کنید."
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+ "var json = pm.response.json();",
+ "",
+ "// برای ESB v2",
+ "if (json.status === 0 && json.list && json.list.length > 0) {",
+ " pm.collectionVariables.set('last_received_id', json.list[0].id);",
+ " console.log('last_received_id saved:', json.list[0].id);",
+ "}",
+ "// برای REST",
+ "if (json.list && Array.isArray(json.list) && json.list.length > 0) {",
+ " pm.collectionVariables.set('last_received_id', json.list[0].id);",
+ " console.log('last_received_id (REST) saved:', json.list[0].id);",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "علامت‌گذاری خوانده‌شده (sms_receive_change_read)",
+ "request": {
+ "method": "GET",
+ "header": [
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": true
+ }
+ ],
+ "url": {
+ "raw": "{{rest_base_url}}/sms_receive_change_read?api_key={{api_key}}&ids[]={{last_received_id}}&read=1",
+ "host": [
+ "{{rest_base_url}}"
+ ],
+ "path": [
+ "sms_receive_change_read"
+ ],
+ "query": [
+ {
+ "key": "api_key",
+ "value": "{{api_key}}",
+ "description": "کلید API"
+ },
+ {
+ "key": "ids[]",
+ "value": "{{last_received_id}}",
+ "description": "ID پیامک دریافتی — از last_received_id خودکار پر می‌شود"
+ },
+ {
+ "key": "read",
+ "value": "1",
+ "description": "۱=خوانده‌شده، ۰=خوانده‌نشده"
+ }
+ ]
+ },
+ "description": "پیامک‌های دریافتی را به‌عنوان خوانده‌شده علامت بزنید."
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status 200', function(){ pm.response.to.have.status(200); });"
+ ]
+ }
+ }
+ ],
+ "response": []
+ }
+ ]
+ },
+ {
+ "name": "پلتفرم ESB v2",
+ "description": "API مدرن ESB v2 — پیشنهاد شده برای پروژه‌های جدید\n\n**آدرس پایه:** `{{esb_base_url}}` \n**احراز هویت:** تمام درخواست‌ها نیاز به هدر `Authorization: Basic {{esb_auth}}` دارند.\n\n**پورت‌ها:**\n| پورت | متد |\n|---|---|\n| 3000 | PeerToPeer |\n| 3001 | Bulk |\n| 3002 | Otp |\n| 3003 | Delivery |\n| 3004 | ReceivedList |\n| 3005 | ReceivedChangeRead |\n| 3006 | UserInfo |\n\n**مقدار `esb_auth`** را در متغیرهای collection تنظیم کنید:\n`base64_encode('username:password')`",
+ "item": [
+ {
+ "name": "اطلاعات کاربر (UserInfo)",
+ "request": {
+ "method": "GET",
+ "header": [
+ {
+ "key": "Authorization",
+ "value": "Basic {{esb_auth}}",
+ "type": "text",
+ "description": "HTTP Basic Auth — مقدار esb_auth را در متغیرهای collection تنظیم کنید"
+ },
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": true
+ }
+ ],
+ "url": {
+ "raw": "{{esb_base_url}}:3006/UserInfo",
+ "host": [
+ "{{esb_base_url}}"
+ ],
+ "port": "3006",
+ "path": [
+ "UserInfo"
+ ]
+ },
+ "description": "دریافت اطلاعات حساب کاربری و موجودی. نیازی به ارسال body نیست.\n\n**پاسخ:**\n```json\n{\n \"status\": 0,\n \"userInfo\": {\n \"Username\": \"admin\",\n \"Cash\": 40034755,\n \"DateExpire\": 4531408200\n }\n}\n```"
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status 200', function(){ pm.response.to.have.status(200); });",
+ "var json = pm.response.json();",
+ "pm.test('ESB status is 0', function(){ pm.expect(json.status).to.eql(0); });",
+ "if (json.status === 0 && json.userInfo) {",
+ " console.log('User:', json.userInfo.Username);",
+ " console.log('Balance:', json.userInfo.Cash, 'ریال');",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "ارسال نظیر به نظیر (PeerToPeer)",
+ "request": {
+ "method": "POST",
+ "header": [
+ {
+ "key": "Authorization",
+ "value": "Basic {{esb_auth}}",
+ "type": "text",
+ "description": "HTTP Basic Auth — مقدار esb_auth را در متغیرهای collection تنظیم کنید"
+ },
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": false
+ }
+ ],
+ "url": {
+ "raw": "{{esb_base_url}}:3000/PeerToPeer",
+ "host": [
+ "{{esb_base_url}}"
+ ],
+ "port": "3000",
+ "path": [
+ "PeerToPeer"
+ ]
+ },
+ "description": "ارسال پیامک‌های متفاوت به گیرنده‌های مختلف (حداکثر ۱۰۰ گیرنده در هر درخواست).\n\n> برای OTP از متد `/Otp` استفاده کنید — نه این متد.**\n\n**uid:** شناسه یکتا — اگر در بازه ۲ ساعته مجدد ارسال شود، همان smsid قبلی برگردانده می‌شود (ضد تکرار).\n\n> auto-fill: uid قبل از ارسال خودکار تولید می‌شود و smsids بعد از موفقیت ذخیره می‌شوند.",
+ "body": {
+ "mode": "raw",
+ "raw": "{\n \"senders\": [\n \"{{sender_number}}\"\n ],\n \"recipients\": [\n \"{{recipient_number}}\"\n ],\n \"messages\": [\n \"سلام! این یک پیامک آزمایشی از ESB v2 است.\"\n ],\n \"uids\": [\n \"{{generated_uid}}\"\n ]\n}",
+ "options": {
+ "raw": {
+ "language": "json"
+ }
+ }
+ }
+ },
+ "event": [
+ {
+ "listen": "prerequest",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "// تولید uid یکتا برای این درخواست",
+ "var uid = 'pf-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);",
+ "pm.variables.set('generated_uid', uid);",
+ "console.log('Generated UID:', uid);"
+ ]
+ }
+ },
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "// بررسی وضعیت پاسخ",
+ "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+ "",
+ "var json = pm.response.json();",
+ "pm.test('ESB status is 0 (success)', function() {",
+ " pm.expect(json.status).to.eql(0);",
+ "});",
+ "",
+ "// ذخیره smsids در متغیر collection",
+ "if (json.status === 0) {",
+ " if (json.smsids && json.smsids.length > 0) {",
+ " pm.collectionVariables.set('last_smsids', JSON.stringify(json.smsids));",
+ " pm.collectionVariables.set('last_smsid', json.smsids[0]);",
+ " console.log('smsids saved:', json.smsids);",
+ " }",
+ " if (json.smsid) {",
+ " pm.collectionVariables.set('last_smsid', json.smsid);",
+ " pm.collectionVariables.set('esb_otp_smsid', json.smsid);",
+ " console.log('OTP smsid saved:', json.smsid);",
+ " }",
+ "} else {",
+ " console.warn('ERROR ESB status:', json.status, json.messages);",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "ارسال گروهی (Bulk)",
+ "request": {
+ "method": "POST",
+ "header": [
+ {
+ "key": "Authorization",
+ "value": "Basic {{esb_auth}}",
+ "type": "text",
+ "description": "HTTP Basic Auth — مقدار esb_auth را در متغیرهای collection تنظیم کنید"
+ },
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": false
+ }
+ ],
+ "url": {
+ "raw": "{{esb_base_url}}:3001/Bulk",
+ "host": [
+ "{{esb_base_url}}"
+ ],
+ "port": "3001",
+ "path": [
+ "Bulk"
+ ]
+ },
+ "description": "ارسال یک متن یکسان به چند گیرنده. مناسب برای اطلاع‌رسانی عمومی و کمپین‌های تبلیغاتی.\n\n`uids` باید همتعداد `recipients` باشد.",
+ "body": {
+ "mode": "raw",
+ "raw": "{\n \"sender\": \"{{sender_number}}\",\n \"recipients\": [\n \"{{recipient_number}}\",\n \"+989137001122\"\n ],\n \"message\": \"پیام یکسان برای همه گیرنده‌ها — مناسب برای کمپین‌های تبلیغاتی\",\n \"uids\": [\n \"{{generated_uid}}-0\",\n \"{{generated_uid}}-1\"\n ]\n}",
+ "options": {
+ "raw": {
+ "language": "json"
+ }
+ }
+ }
+ },
+ "event": [
+ {
+ "listen": "prerequest",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "// تولید uid یکتا برای این درخواست",
+ "var uid = 'pf-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);",
+ "pm.variables.set('generated_uid', uid);",
+ "console.log('Generated UID:', uid);"
+ ]
+ }
+ },
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "// بررسی وضعیت پاسخ",
+ "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+ "",
+ "var json = pm.response.json();",
+ "pm.test('ESB status is 0 (success)', function() {",
+ " pm.expect(json.status).to.eql(0);",
+ "});",
+ "",
+ "// ذخیره smsids در متغیر collection",
+ "if (json.status === 0) {",
+ " if (json.smsids && json.smsids.length > 0) {",
+ " pm.collectionVariables.set('last_smsids', JSON.stringify(json.smsids));",
+ " pm.collectionVariables.set('last_smsid', json.smsids[0]);",
+ " console.log('smsids saved:', json.smsids);",
+ " }",
+ " if (json.smsid) {",
+ " pm.collectionVariables.set('last_smsid', json.smsid);",
+ " pm.collectionVariables.set('esb_otp_smsid', json.smsid);",
+ " console.log('OTP smsid saved:', json.smsid);",
+ " }",
+ "} else {",
+ " console.warn('ERROR ESB status:', json.status, json.messages);",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "ارسال OTP (Otp)",
+ "request": {
+ "method": "POST",
+ "header": [
+ {
+ "key": "Authorization",
+ "value": "Basic {{esb_auth}}",
+ "type": "text",
+ "description": "HTTP Basic Auth — مقدار esb_auth را در متغیرهای collection تنظیم کنید"
+ },
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": false
+ }
+ ],
+ "url": {
+ "raw": "{{esb_base_url}}:3002/Otp",
+ "host": [
+ "{{esb_base_url}}"
+ ],
+ "port": "3002",
+ "path": [
+ "Otp"
+ ]
+ },
+ "description": "ارسال رمز یکبار مصرف (OTP). در هر درخواست فقط یک پیامک ارسال می‌شود.\n\n️ **استفاده از این endpoint برای محتوای غیر OTP مجاز نیست.**\n\nuid یکتا قبل از ارسال خودکار تولید می‌شود.\n\n> auto-fill: `esb_otp_smsid` و `last_smsid` بعد از موفقیت ذخیره می‌شوند.",
+ "body": {
+ "mode": "raw",
+ "raw": "{\n \"sender\": \"{{sender_number}}\",\n \"recipient\": \"{{recipient_number}}\",\n \"message\": \"کد تأیید شما: 123456 — این کد ۵ دقیقه اعتبار دارد.\",\n \"uid\": \"{{generated_uid}}\"\n}",
+ "options": {
+ "raw": {
+ "language": "json"
+ }
+ }
+ }
+ },
+ "event": [
+ {
+ "listen": "prerequest",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "// تولید uid یکتا برای این درخواست",
+ "var uid = 'pf-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);",
+ "pm.variables.set('generated_uid', uid);",
+ "console.log('Generated UID:', uid);"
+ ]
+ }
+ },
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "// بررسی وضعیت پاسخ",
+ "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+ "",
+ "var json = pm.response.json();",
+ "pm.test('ESB status is 0 (success)', function() {",
+ " pm.expect(json.status).to.eql(0);",
+ "});",
+ "",
+ "// ذخیره smsids در متغیر collection",
+ "if (json.status === 0) {",
+ " if (json.smsids && json.smsids.length > 0) {",
+ " pm.collectionVariables.set('last_smsids', JSON.stringify(json.smsids));",
+ " pm.collectionVariables.set('last_smsid', json.smsids[0]);",
+ " console.log('smsids saved:', json.smsids);",
+ " }",
+ " if (json.smsid) {",
+ " pm.collectionVariables.set('last_smsid', json.smsid);",
+ " pm.collectionVariables.set('esb_otp_smsid', json.smsid);",
+ " console.log('OTP smsid saved:', json.smsid);",
+ " }",
+ "} else {",
+ " console.warn('ERROR ESB status:', json.status, json.messages);",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "وضعیت دلیوری (Delivery)",
+ "request": {
+ "method": "POST",
+ "header": [
+ {
+ "key": "Authorization",
+ "value": "Basic {{esb_auth}}",
+ "type": "text",
+ "description": "HTTP Basic Auth — مقدار esb_auth را در متغیرهای collection تنظیم کنید"
+ },
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": false
+ }
+ ],
+ "url": {
+ "raw": "{{esb_base_url}}:3003/Delivery",
+ "host": [
+ "{{esb_base_url}}"
+ ],
+ "port": "3003",
+ "path": [
+ "Delivery"
+ ]
+ },
+ "description": "وضعیت تحویل پیامک‌های ارسال‌شده را بررسی کنید.\n\n**نکته:** بدنه درخواست مستقیم یک آرایه JSON است (بدون wrapper).\n\n`{{last_smsid}}` خودکار از آخرین درخواست ارسال پر می‌شود.\n\n⏱️ وضعیت پیامک‌های حداکثر **۴۸ ساعت** اخیر قابل دریافت است.\n\n**کدهای dlr:**\n| کد | معنا |\n|---|---|\n| 1 | رسیده به گوشی |\n| 2 | نرسیده |\n| 4 | در صف |\n| 11 | اسپم |",
+ "body": {
+ "mode": "raw",
+ "raw": "[\"{{last_smsid}}\"]",
+ "options": {
+ "raw": {
+ "language": "json"
+ }
+ }
+ }
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status 200', function(){ pm.response.to.have.status(200); });",
+ "var json = pm.response.json();",
+ "pm.test('ESB status is 0', function(){ pm.expect(json.status).to.eql(0); });",
+ "if (json.status === 0 && json.dlrs) {",
+ " var labels = {'1':' رسیده','2':'نرسیده','4':'در صف','5':'لیست سیاه','11':'اسپم','12':'منقضی'};",
+ " Object.keys(json.dlrs).forEach(function(id) {",
+ " var dlr = json.dlrs[id].dlr;",
+ " console.log('DLR ' + id + ' → ' + (labels[String(dlr)] || 'کد ' + dlr));",
+ " });",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "پیامک‌های دریافتی (ReceivedList)",
+ "request": {
+ "method": "POST",
+ "header": [
+ {
+ "key": "Authorization",
+ "value": "Basic {{esb_auth}}",
+ "type": "text",
+ "description": "HTTP Basic Auth — مقدار esb_auth را در متغیرهای collection تنظیم کنید"
+ },
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": false
+ }
+ ],
+ "url": {
+ "raw": "{{esb_base_url}}:3004/ReceivedList",
+ "host": [
+ "{{esb_base_url}}"
+ ],
+ "port": "3004",
+ "path": [
+ "ReceivedList"
+ ]
+ },
+ "description": "لیست پیامک‌های دریافتی (MO) را دریافت کنید.\n\n**پارامترها:**\n| پارامتر | توضیح |\n|---|---|\n| `page_number` | شماره صفحه (از ۱) |\n| `perpage` | تعداد نتایج (۱ تا ۱۰۰) |\n| `read` | `-1`=همه، `0`=خوانده‌نشده، `1`=خوانده‌شده |\n| `fromid` | فقط پیام‌های جدیدتر از این ID |\n| `ordermode` | `DESC` یا `ASC` |\n| `count` | برگرداندن تعداد کل |\n\n `last_received_id` بعد از دریافت خودکار ذخیره می‌شود.",
+ "body": {
+ "mode": "raw",
+ "raw": "{\n \"page_number\": 1,\n \"perpage\": 20,\n \"read\": 0,\n \"ordermode\": \"DESC\",\n \"count\": true\n}",
+ "options": {
+ "raw": {
+ "language": "json"
+ }
+ }
+ }
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+ "var json = pm.response.json();",
+ "",
+ "// برای ESB v2",
+ "if (json.status === 0 && json.list && json.list.length > 0) {",
+ " pm.collectionVariables.set('last_received_id', json.list[0].id);",
+ " console.log('last_received_id saved:', json.list[0].id);",
+ "}",
+ "// برای REST",
+ "if (json.list && Array.isArray(json.list) && json.list.length > 0) {",
+ " pm.collectionVariables.set('last_received_id', json.list[0].id);",
+ " console.log('last_received_id (REST) saved:', json.list[0].id);",
+ "}"
+ ]
+ }
+ }
+ ],
+ "response": []
+ },
+ {
+ "name": "علامت‌گذاری دریافتی (ReceivedChangeRead)",
+ "request": {
+ "method": "POST",
+ "header": [
+ {
+ "key": "Authorization",
+ "value": "Basic {{esb_auth}}",
+ "type": "text",
+ "description": "HTTP Basic Auth — مقدار esb_auth را در متغیرهای collection تنظیم کنید"
+ },
+ {
+ "key": "Content-Type",
+ "value": "application/json",
+ "type": "text",
+ "disabled": false
+ }
+ ],
+ "url": {
+ "raw": "{{esb_base_url}}:3005/ReceivedChangeRead",
+ "host": [
+ "{{esb_base_url}}"
+ ],
+ "port": "3005",
+ "path": [
+ "ReceivedChangeRead"
+ ]
+ },
+ "description": "پیامک‌های دریافتی را به‌عنوان خوانده‌شده یا خوانده‌نشده علامت بزنید.\n\n`{{last_received_id}}` خودکار از آخرین ReceivedList پر می‌شود.\n\n**مقادیر `read`:** `1` = خوانده‌شده، `0` = خوانده‌نشده",
+ "body": {
+ "mode": "raw",
+ "raw": "{\n \"read\": 1,\n \"ids\": [\n \"{{last_received_id}}\"\n ]\n}",
+ "options": {
+ "raw": {
+ "language": "json"
+ }
+ }
+ }
+ },
+ "event": [
+ {
+ "listen": "test",
+ "script": {
+ "type": "text/javascript",
+ "exec": [
+ "pm.test('Status 200', function(){ pm.response.to.have.status(200); });",
+ "var json = pm.response.json();",
+ "pm.test('ESB status is 0', function(){ pm.expect(json.status).to.eql(0); });",
+ "console.log('Messages marked as read');"
+ ]
+ }
+ }
+ ],
+ "response": []
+ }
+ ],
+ "auth": {
+ "type": "basic",
+ "basic": [
+ {
+ "key": "password",
+ "value": "",
+ "type": "string"
+ },
+ {
+ "key": "username",
+ "value": "",
+ "type": "string"
+ }
+ ]
+ }
+ },
+ {
+ "name": "مرجع — کدهای خطا و وضعیت",
+ "description": "این folder درخواستی ندارد — فقط برای مراجعه سریع به کدها است.",
+ "item": [
+ {
+ "name": "راهنمای کدهای خطا",
+ "request": {
+ "method": "GET",
+ "header": [],
+ "url": {
+ "raw": "https://sms.persiafava.com",
+ "host": [
+ "https://sms.persiafava.com"
+ ]
+ },
+ "description": "## کدهای وضعیت پیامک (مشترک هر دو پلتفرم)\n\n| کد | معنا |\n|---|---|\n| -2 | پیام حذف شده |\n| -1 | در آرشیو |\n| 0 | بدون وضعیت |\n| **1** | **رسیده به گوشی** |\n| 2 | نرسیده |\n| 3 | ارسال نشده به مخابرات |\n| 4 | ⏳ ارسال شده به مخابرات |\n| 5 | لیست سیاه مخابرات |\n| 8 | ارسال شده به اپراتور |\n| 9 | بازگشت هزینه |\n| 10 | در صف ارسال |\n| 11 | اسپم |\n| 12 | منقضی (Expired) |\n| 13 | No Route |\n| 14 | Rejected |\n| 16 | نرسیده به مخابرات |\n\n---\n\n## کدهای خطا ESB v2 (status != 0)\n\n| کد | معنا | اقدام |\n|---|---|---|\n| 2 | Authorization header نیست | هدر اضافه کنید |\n| 3 | فرمت auth نامعتبر | Basic format را بررسی کنید |\n| 4–6 | خطای داخلی سرور | دوباره امتحان کنید |\n| 7 | حساب یافت نشد | با پشتیبانی تماس بگیرید |\n| 8 | حساب غیرفعال | با پشتیبانی تماس بگیرید |\n| 9 | IP مجاز نیست | IP را whitelist کنید |\n| 10 | JSON نامعتبر | JSON را اعتبارسنجی کنید |\n| 20 | آرایه‌ها هم‌اندازه نیستند | senders/recipients/messages/uids باید برابر باشند |\n| 21 | آرایه uid خالی | حداقل یک uid بفرستید |\n| 22 | تعداد بیش از حد | حداکثر ۱۰۰ گیرنده |\n| 23 | شماره فرستنده متعلق به شما نیست | از شماره اختصاصی استفاده کنید |\n| 24 | موجودی کافی نیست | شارژ کنید |\n| 26 | فرمت گیرنده نامعتبر | از +989xxxxxxxxx استفاده کنید |\n| 27 | گیرنده در لیست سیاه | از لیست حذف کنید |\n\n---\n\n## کدهای خطا REST (رشته‌ای)\n\n| کد | معنا |\n|---|---|\n| `error_credit_error` | موجودی کافی نیست |\n| `error_sender_number_is_not_allow` | شماره فرستنده مجاز نیست |\n| `error_sender_number_is_disable` | شماره فرستنده غیرفعال |\n| `error_sms_receiver_number_limit` | تعداد گیرنده بیش از حد |\n\n## درگاه‌های ارسال REST\n\n| کد | درگاه |\n|---|---|\n| `3000` | پیش‌فرض |\n| `9810` | همراه اول |\n| `9811` | ایرانسل |\n| `9814` | رایتل |"
+ },
+ "response": []
+ }
+ ]
+ }
+ ]
+}
